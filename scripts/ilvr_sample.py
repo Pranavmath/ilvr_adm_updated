@@ -57,8 +57,8 @@ def main():
     logger.log("creating resizers...")
     assert math.log(args.down_N, 2).is_integer()
 
-    shape = (args.batch_size, 3, args.image_size, args.image_size)
-    shape_d = (args.batch_size, 3, int(args.image_size / args.down_N), int(args.image_size / args.down_N))
+    shape = (args.batch_size, 1, args.image_size, args.image_size)
+    shape_d = (args.batch_size, 1, int(args.image_size / args.down_N), int(args.image_size / args.down_N))
     down = Resizer(shape, 1 / args.down_N).to(next(model.parameters()).device)
     up = Resizer(shape_d, args.down_N).to(next(model.parameters()).device)
     resizers = (down, up)
@@ -78,7 +78,7 @@ def main():
         model_kwargs = {k: v.to(dist_util.dev()) for k, v in model_kwargs.items()}
         sample = diffusion.p_sample_loop(
             model,
-            (args.batch_size, 3, args.image_size, args.image_size),
+            (args.batch_size, 1, args.image_size, args.image_size),
             clip_denoised=args.clip_denoised,
             model_kwargs=model_kwargs,
             resizers=resizers,
@@ -93,7 +93,7 @@ def main():
                 out_path,
                 nrow=1,
                 normalize=True,
-                range=(-1, 1),
+                value_range=(-1, 1),
             )
 
         count += 1
