@@ -105,7 +105,7 @@ class ImageDataset(Dataset):
         with bf.BlobFile(path, "rb") as f:
             pil_image = Image.open(f)
             pil_image.load()
-        pil_image = pil_image.convert("RGB")
+        pil_image = pil_image.convert("L") # RGB
 
         if self.random_crop:
             arr = random_crop_arr(pil_image, self.resolution)
@@ -116,6 +116,10 @@ class ImageDataset(Dataset):
             arr = arr[:, ::-1]
 
         arr = arr.astype(np.float32) / 127.5 - 1
+
+        arr = np.expand_dims(arr, axis=2)
+
+        #print(arr.shape)
 
         out_dict = {}
         if self.local_classes is not None:
